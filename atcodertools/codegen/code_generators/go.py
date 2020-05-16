@@ -10,7 +10,7 @@ from atcodertools.fmtprediction.models.variable import Variable
 
 
 def _make_loop_header(loop_var: str, length: str):
-    return "for {loop_var} := int64(0); {loop_var} < {length}; {loop_var}++ {{".format(
+    return "for {loop_var} := 0; {loop_var} < {length}; {loop_var}++ {{".format(
         loop_var=loop_var,
         length=length
     )
@@ -23,7 +23,7 @@ def _loop_header(var: Variable, for_second_index: bool):
     else:
         index = var.first_index
         loop_var = "i"
-    return "for {loop_var} := int64(0); {loop_var} < {length}; {loop_var}++ {{".format(
+    return "for {loop_var} := 0; {loop_var} < {length}; {loop_var}++ {{".format(
         loop_var=loop_var,
         length=index.get_length()
     )
@@ -56,7 +56,7 @@ class GoCodeGenerator:
         if type_ == Type.float:
             return "float64"
         elif type_ == Type.int:
-            return "int64"
+            return "int"
         elif type_ == Type.str:
             return "string"
         else:
@@ -147,7 +147,9 @@ class GoCodeGenerator:
                 '{name}, _ = strconv.ParseFloat(scanner.Text(), 64)'.format(name=name))
         elif var.type == Type.int:
             lines.append(
-                '{name}, _ = strconv.ParseInt(scanner.Text(), 10, 64)'.format(name=name))
+                'temp{name}, _ := strconv.ParseInt(scanner.Text(), 10, 64)'.format(name=name))
+            lines.append(
+                '{name} = int(temp{name})'.format(name=name))
         elif var.type == Type.str:
             lines.append('{name} = scanner.Text()'.format(name=name))
         else:
